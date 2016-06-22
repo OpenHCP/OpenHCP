@@ -1,0 +1,5 @@
+hosts = DBHOST
+user = DBUSER
+password = DBPASS
+dbname = DBNAME
+query = SELECT domain FROM mail_transport WHERE domain='%s' AND active=1

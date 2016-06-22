@@ -1,0 +1,5 @@
+hosts = DBHOST
+user = DBUSER
+password = DBPASS
+dbname = DBNAME
+query = SELECT email FROM mail_user WHERE email='%s' AND active=1

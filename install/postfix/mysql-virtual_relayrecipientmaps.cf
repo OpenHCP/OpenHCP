@@ -1,0 +1,5 @@
+hosts = DBHOST
+user = DBUSER
+password = DBPASS
+dbname = DBNAME
+query = SELECT access FROM mail_relay_recipient WHERE source='%s' AND active=1

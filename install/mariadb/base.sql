@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost
--- Czas generowania: 22 Cze 2016, 18:29
+-- Czas generowania: 26 Cze 2016, 15:50
 -- Wersja serwera: 10.0.25-MariaDB-0+deb8u1
 -- Wersja PHP: 5.6.22-0+deb8u1
 
@@ -94,6 +94,7 @@ CREATE TABLE `mail_access` (
 
 CREATE TABLE `mail_domain` (
   `id` int(10) UNSIGNED NOT NULL,
+  `client_id` int(10) UNSIGNED NOT NULL,
   `domain` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
   `active` tinyint(1) UNSIGNED NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -146,13 +147,9 @@ CREATE TABLE `mail_transport` (
 CREATE TABLE `mail_user` (
   `id` int(10) UNSIGNED NOT NULL,
   `uiddb_uid` int(10) UNSIGNED NOT NULL,
-  `client_id` int(10) UNSIGNED NOT NULL,
   `email` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `login` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
   `password` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
   `name` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `uid` int(10) UNSIGNED NOT NULL,
-  `gid` int(10) UNSIGNED NOT NULL,
   `maildir` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
   `quota` bigint(20) UNSIGNED DEFAULT NULL,
   `active` tinyint(1) UNSIGNED NOT NULL
@@ -323,7 +320,8 @@ ALTER TABLE `mail_access`
 -- Indexes for table `mail_domain`
 --
 ALTER TABLE `mail_domain`
-  ADD PRIMARY KEY (`id`);
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `INDEX` (`client_id`,`active`);
 
 --
 -- Indexes for table `mail_forwarding`
@@ -348,7 +346,7 @@ ALTER TABLE `mail_transport`
 --
 ALTER TABLE `mail_user`
   ADD PRIMARY KEY (`id`),
-  ADD KEY `INDEX` (`id`,`uiddb_uid`,`client_id`,`uid`,`gid`,`quota`,`active`),
+  ADD KEY `INDEX` (`id`,`uiddb_uid`,`quota`,`active`),
   ADD KEY `uiddb_uid` (`uiddb_uid`);
 
 --
@@ -393,17 +391,17 @@ ALTER TABLE `uiddb`
 -- AUTO_INCREMENT dla tabeli `client`
 --
 ALTER TABLE `client`
-  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'client ID', AUTO_INCREMENT=4;
+  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'client ID', AUTO_INCREMENT=1;
 --
 -- AUTO_INCREMENT dla tabeli `ftp`
 --
 ALTER TABLE `ftp`
-  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=1;
 --
 -- AUTO_INCREMENT dla tabeli `http`
 --
 ALTER TABLE `http`
-  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=1;
 --
 -- AUTO_INCREMENT dla tabeli `mail_access`
 --
@@ -413,7 +411,7 @@ ALTER TABLE `mail_access`
 -- AUTO_INCREMENT dla tabeli `mail_domain`
 --
 ALTER TABLE `mail_domain`
-  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=1;
 --
 -- AUTO_INCREMENT dla tabeli `mail_forwarding`
 --
@@ -433,7 +431,7 @@ ALTER TABLE `mail_transport`
 -- AUTO_INCREMENT dla tabeli `mail_user`
 --
 ALTER TABLE `mail_user`
-  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=1;
 --
 -- AUTO_INCREMENT dla tabeli `server`
 --
@@ -448,7 +446,7 @@ ALTER TABLE `spamfilter_policy`
 -- AUTO_INCREMENT dla tabeli `spamfilter_users`
 --
 ALTER TABLE `spamfilter_users`
-  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=1;
 --
 -- AUTO_INCREMENT dla tabeli `spamfilter_wblist`
 --
@@ -458,7 +456,7 @@ ALTER TABLE `spamfilter_wblist`
 -- AUTO_INCREMENT dla tabeli `uiddb`
 --
 ALTER TABLE `uiddb`
-  MODIFY `uid` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2006;
+  MODIFY `uid` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2000;
 --
 -- Ograniczenia dla zrzutów tabel
 --
@@ -480,6 +478,12 @@ ALTER TABLE `ftp`
 --
 ALTER TABLE `http`
   ADD CONSTRAINT `http_ibfk_1` FOREIGN KEY (`uiddb_uid`) REFERENCES `uiddb` (`uid`) ON DELETE CASCADE;
+
+--
+-- Ograniczenia dla tabeli `mail_domain`
+--
+ALTER TABLE `mail_domain`
+  ADD CONSTRAINT `mail_domain_ibfk_1` FOREIGN KEY (`client_id`) REFERENCES `client` (`id`) ON DELETE CASCADE;
 
 --
 -- Ograniczenia dla tabeli `mail_user`
@@ -504,4 +508,3 @@ ALTER TABLE `spamfilter_wblist`
 --
 ALTER TABLE `uiddb`
   ADD CONSTRAINT `uiddb_ibfk_1` FOREIGN KEY (`client_id`) REFERENCES `client` (`id`) ON DELETE CASCADE;
-

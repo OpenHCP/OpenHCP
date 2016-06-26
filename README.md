@@ -1,7 +1,7 @@
-## IT'S NOT EVEN ALPHA!!!
-## DO NOT USE IT IF YOU'RE NOT POWERUSER/ADMIN!!!
+# IT'S NOT EVEN ALPHA!!!
+# DO NOT USE IT IF YOU'RE NOT POWERUSER/ADMIN!!!
 
-# Open Hosting Control Panel - OpenHCP
+## Open Hosting Control Panel - OpenHCP
 
 Assumptions:
 - free / libre control panel for hosting
@@ -19,10 +19,11 @@ Plans (it's easier to say what is done...):
 - extend to other service daemons (nginx, exim, etc.)
 - APS Standard
 - API for everything
+- transactions in API and foreign keys in database
 - support for IPv6
 - billing (connection to external services via API)
 
-# How to install
+## How to install (scripts will replace your packages and configs - you have been warned!)
 
 1. Install Debian stable Jessie 64-bit with minimal options (SSH for example)
 2. apt-get install git
@@ -32,3 +33,17 @@ Plans (it's easier to say what is done...):
 6. Provide (if you want) SSL/TLS certificate+key
 7. chmod 700 ./install*
 8. ./install.sh
+
+## features (what is working now)
+
+- installing OpenHCP on Debian stable (Jessie) 64-bit
+- configuration in database
+- dovecot connected with postfix as authentication and delivery agent
+- simplified SQL schema with foreign keys and in InnoDB (XtraDB) - not yet finalised
+- SSL/TLS security (but you have to provide cert/key for now)
+- amavis with support for policies in SQL
+- pure-ftpd with virtual users in SQL
+- config and chroot env for PHP-FPM
+- apache config for http and https
+- sieve global config to put SPAM in Junk mail directory
+- ability to deactivate client with all his accounts or just one account - www not included

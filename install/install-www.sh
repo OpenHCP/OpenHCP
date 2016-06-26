@@ -60,7 +60,7 @@ mount -o bind /run/mysqld/ /var/openhcp/openhcp/www/api/var/run/mysqld/
 wget http://svn.apache.org/repos/asf/httpd/httpd/trunk/docs/conf/mime.types -O /var/openhcp/openhcp/www/api/etc/mime.types
 cp apache/openhcp.conf /etc/apache2/sites-available/
 a2dissite 000-default
-a2ensite openhcp
+ln -s ../sites-available/exabytes.conf /etc/apache2/sites-enabled/000-openhcp.conf
 
 service php5-fpm restart
 service apache2 restart

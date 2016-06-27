@@ -16,8 +16,8 @@ echo "$SQL" | mysql mysql
 
 mysql openhcp < mariadb/base.sql
 
-# only for multi-server
-#echo 'bind-address = 0.0.0.0' >> /etc/mysql/conf.d/openhcp.cnf
+cat mariadb/openhcp.cnf > /etc/mysql/conf.d/openhcp.cnf
 
 # TODO - firewall
-#systemctl restart mysql
+
+systemctl restart mysql

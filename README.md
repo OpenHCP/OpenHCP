@@ -22,6 +22,7 @@ Plans (it's easier to say what is done...):
 - transactions in API and foreign keys in database
 - support for IPv6
 - billing (connection to external services via API)
+- move some parts to ansible (or other tool for Ops)
 
 ## How to install (scripts will replace your packages and configs - you have been warned!)
 

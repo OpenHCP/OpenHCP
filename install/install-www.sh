@@ -24,6 +24,7 @@ cat /etc/php5/fpm/php.ini | \
 	sed -e "s/;date.timezone =/date.timezone = $(echo $PHPTZ | sed -e 's/[/]/\\&/g')/" | \
 	sed -e 's/expose_php = On/expose_php = Off/' | \
 	sed -e 's/; max_input_vars = 1000/max_input_vars = 10000/' | \
+	sed -e 's/;session.entropy_file = \/dev\/urandom/session.entropy_file = \/dev\/random/' | \
 	sed -e 's/;openssl.capath=/openssl.capath = \/etc\/ssl\/certs/' > $PHPTMP
 cat $PHPTMP > /etc/php5/fpm/php.ini
 cp /etc/php5/cli/php.ini /etc/php5/cli/php.ini.`date +'%Y%m%d%H%M%S'`
@@ -31,6 +32,7 @@ cat /etc/php5/cli/php.ini | \
 	sed -e "s/;date.timezone =/date.timezone = $(echo $PHPTZ | sed -e 's/[/]/\\&/g')/" | \
 	sed -e 's/expose_php = On/expose_php = Off/' | \
 	sed -e 's/; max_input_vars = 1000/max_input_vars = 10000/' | \
+	sed -e 's/;session.entropy_file = \/dev\/urandom/session.entropy_file = \/dev\/random/' | \
 	sed -e 's/;openssl.capath=/openssl.capath = \/etc\/ssl\/certs/' > $PHPTMP
 cat $PHPTMP > /etc/php5/cli/php.ini
 rm $PHPTMP

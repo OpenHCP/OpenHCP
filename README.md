@@ -12,6 +12,7 @@ Assumptions:
 - simple to install and maintain for admin
 - use of templates for GUI
 - replace sendmail script to send mail() from PHP via authenticated accounts
+- trash directory for deleted accounts data (chown to openhcptrash and move out of user subdir, so that we free client quota)
 
 Plans (it's easier to say what is done...):
 - multiserver design (planned from the beginning - only singleserver supported for now)
@@ -20,6 +21,7 @@ Plans (it's easier to say what is done...):
 - APS Standard
 - API for everything
 - transactions in API and foreign keys in database
+- API with embedded ACL
 - support for IPv6
 - billing (connection to external services via API)
 - move some parts to ansible (or other tool for Ops)

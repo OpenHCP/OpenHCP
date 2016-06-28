@@ -7,7 +7,7 @@ a2enmod rewrite ssl actions include proxy_fcgi headers access_compat
 
 mv /var/www/html /var/www/html.`date +'%Y%m%d%H%M%S'`
 
-# security
+# security (by obscurity) :P
 TMPAPACHE=`mktemp`
 cat /etc/apache2/conf-available/security.conf | sed -e 's/ServerTokens OS/ServerTokens Prod/' | sed -e 's/ServerSignature On/ServerSignature Off/' > $TMPAPACHE
 mv -f $TMPAPACHE /etc/apache2/conf-available/security.conf
@@ -38,7 +38,7 @@ cat $PHPTMP > /etc/php5/cli/php.ini
 rm $PHPTMP
 
 # install ionCube
-#wget http://downloads3.ioncube.com/loader_downloads/ioncube_loaders_lin_x86-64.tar.gz
+wget http://downloads3.ioncube.com/loader_downloads/ioncube_loaders_lin_x86-64.tar.gz
 IONDIR=`mktemp -d`
 tar -xzf ioncube_loaders_lin_x86-64.tar.gz -C ${IONDIR}
 mkdir -p /opt/ioncube/
@@ -55,14 +55,16 @@ cp -a /etc/host.conf /etc/hosts /etc/localtime /etc/resolv.conf /var/openhcp/ope
 cp -a -r /usr/share/zoneinfo /var/openhcp/openhcp/www/api/usr/share/
 cp -a /dev/*random /dev/zero /dev/null /var/openhcp/openhcp/www/api/dev/
 cp -a /lib/x86_64-linux-gnu/libnss_dns*.so* /var/openhcp/openhcp/www/api/lib/
-# MySQL via socket in chroot :)
-# TODO - put it in /etc/fstab
-mount -o bind /run/mysqld/ /var/openhcp/openhcp/www/api/var/run/mysqld/
 
+# MySQL via socket in chroot :)
+echo '/var/run/mysqld	/var/openhcp/openhcp/www/api/var/run/mysqld	none	bind	0	0' >> /etc/fstab
+mount /var/openhcp/openhcp/www/api/var/run/mysqld/
+
+# current mime-types
 wget http://svn.apache.org/repos/asf/httpd/httpd/trunk/docs/conf/mime.types -O /var/openhcp/openhcp/www/api/etc/mime.types
 cp apache/openhcp.conf /etc/apache2/sites-available/
 a2dissite 000-default
-ln -s ../sites-available/exabytes.conf /etc/apache2/sites-enabled/000-openhcp.conf
+ln -s ../sites-available/openhcp.conf /etc/apache2/sites-enabled/000-openhcp.conf
 
 service php5-fpm restart
 service apache2 restart

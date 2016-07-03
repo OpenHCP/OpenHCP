@@ -23,7 +23,8 @@ SET time_zone = "+00:00";
 CREATE TABLE `client` (
   `id` int(10) UNSIGNED NOT NULL COMMENT 'client ID',
   `name` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `gid` int(10) UNSIGNED NOT NULL,
+  `password` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `gid` int(10) UNSIGNED DEFAULT NULL,
   `active` tinyint(1) UNSIGNED NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
@@ -288,7 +289,8 @@ CREATE TABLE `uiddb` (
 --
 ALTER TABLE `client`
   ADD PRIMARY KEY (`id`),
-  ADD UNIQUE KEY `UNIQUE` (`gid`);
+  ADD UNIQUE KEY `UNIQUE1` (`name`) USING BTREE,
+  ADD UNIQUE KEY `UNIQUE2` (`gid`);
 
 --
 -- Indexes for table `client_data`

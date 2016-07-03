@@ -4,7 +4,7 @@
 ## Open Hosting Control Panel - OpenHCP
 
 Assumptions:
-- free / libre control panel for hosting
+- free / libre (ISC License) control panel for hosting
 - security features - as much as possible (don't sacrifice security for speed)
 - specialized for shared hosting - LAMP - Linux (stable Debian 64-bit) + Apache 2.4 + MariaDB 10 + PHP-FPM
 - very flexible quota (for client and per account)
@@ -16,6 +16,8 @@ Assumptions:
 
 Plans (it's easier to say what is done...):
 - multiserver design (planned from the beginning - only singleserver supported for now)
+- ability to maintain cross-server quota per-client
+- ability to maintain database quota
 - extend to other distro (CentOS would be a good start) and derivatives
 - extend to other service daemons (nginx, exim, etc.)
 - APS Standard

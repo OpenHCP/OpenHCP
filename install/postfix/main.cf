@@ -3,7 +3,8 @@ inet_protocols = all
 
 # Virtual
 virtual_alias_domains =
-virtual_alias_maps = proxy:mysql:/etc/postfix/mysql-virtual_forwardings.cf, proxy:mysql:/etc/postfix/mysql-virtual_email2email.cf
+virtual_alias_maps = proxy:mysql:/etc/postfix/mysql-virtual_forwardings.cf
+	proxy:mysql:/etc/postfix/mysql-virtual_email2email.cf
 virtual_mailbox_domains = proxy:mysql:/etc/postfix/mysql-virtual_domains.cf
 virtual_transport = lmtp:unix:private/dovecot-lmtp
 
@@ -15,13 +16,43 @@ smtpd_sasl_type = dovecot
 smtpd_sasl_path = private/auth
 
 # restrictions
-smtpd_recipient_restrictions = permit_mynetworks, permit_sasl_authenticated, reject_unauth_destination, reject_unverified_recipient, check_recipient_access mysql:/etc/postfix/mysql-virtual_recipient.cf
 transport_maps = proxy:mysql:/etc/postfix/mysql-virtual_transports.cf
 relay_domains = mysql:/etc/postfix/mysql-virtual_relaydomains.cf
 relay_recipient_maps = mysql:/etc/postfix/mysql-virtual_relayrecipientmaps.cf
-proxy_read_maps = $local_recipient_maps $mydestination $virtual_alias_maps $virtual_alias_domains $virtual_mailbox_domains $relay_recipient_maps $relay_domains $canonical_maps $sender_canonical_maps $recipient_canonical_maps $relocated_maps $transport_maps $mynetworks
-smtpd_sender_restrictions = check_sender_access mysql:/etc/postfix/mysql-virtual_sender.cf
-smtpd_client_restrictions = check_client_access mysql:/etc/postfix/mysql-virtual_client.cf
+proxy_read_maps = $local_recipient_maps
+	$mydestination
+	$virtual_alias_maps
+	$virtual_alias_domains
+	$virtual_mailbox_domains
+	$relay_recipient_maps
+	$relay_domains
+	$canonical_maps
+	$sender_canonical_maps
+	$recipient_canonical_maps
+	$relocated_maps
+	$transport_maps $mynetworks
+smtpd_helo_required = yes
+smtpd_recipient_restrictions = permit_mynetworks
+	permit_sasl_authenticated
+	reject_unauth_destination
+	reject_unauth_pipelining
+	reject_non_fqdn_recipient
+	reject_unverified_recipient
+	check_recipient_access mysql:/etc/postfix/mysql-virtual_recipient.cf
+smtpd_sender_login_maps = $virtual_alias_maps
+smtpd_sender_restrictions = permit_mynetworks
+	permit_sasl_authenticated
+	reject_sender_login_mismatch
+	reject_unauth_pipelining
+	reject_non_fqdn_sender
+	reject_unknown_helo_hostname
+	reject_unknown_sender_domain
+	reject_unknown_recipient_domain
+	check_sender_access
+	mysql:/etc/postfix/mysql-virtual_sender.cf
+smtpd_client_restrictions = sleep 2
+	reject_unauth_pipelining
+	check_client_access mysql:/etc/postfix/mysql-virtual_client.cf
 
 address_verify_negative_refresh_time = 5m
 address_verify_positive_refresh_time = 5m
@@ -35,6 +66,7 @@ owner_request_special = no
 content_filter = amavis:[127.0.0.1]:10024
 receive_override_options = no_address_mappings
 message_size_limit = 104857600
+disable_vrfy_command = yes
 
 # TLS
 smtp_tls_security_level = may

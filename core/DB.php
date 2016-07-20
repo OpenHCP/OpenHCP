@@ -44,7 +44,7 @@ final class DB {
 	 */
 	public static function getInstance() {
 		if (self::$singleton === false) {
-			self::$singleton = new \LMS\DB();
+			self::$singleton = new \OpenHCP\DB();
 		}
 		return self::$singleton;
 	}

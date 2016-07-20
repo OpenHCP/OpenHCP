@@ -17,10 +17,20 @@ namespace OpenHCP;
  */
 class Login {
 
+	/** @var object $pdo_ro PDO object */
+	private $pdo_ro = false;
+
+	/** @var object $pdo_rw PDO object */
+	private $pdo_rw = false;
+
 	/** @var array $json JSON string with received data */
 	private $json = [];
+	private $login_type = '';
 
 	public function __construct($json) {
+		$db = DB::getInstance();
+		$this->pdo_ro = $db->mysqlConnect('ro');
+		$this->pdo_rw = $db->mysqlConnect('rw');
 		$this->json = $json;
 	}
 
@@ -30,6 +40,7 @@ class Login {
 			 * client name
 			 * "/^[a-z]+[a-z0-9]+[a-z]+$/"
 			 */
+			$this->login_type = 'client';
 			$this->login_client();
 		}
 		/**
@@ -44,29 +55,53 @@ class Login {
 		 * mail user
 		 * "^[a-z.-+@]+$"
 		 */
+		/**
+		 * reseller
+		 * 
+		 */
+		/**
+		 * admin
+		 * 
+		 */
 	}
 
 	private function login_client() {
 		$sql = 'SELECT * FROM client WHERE name = :name AND active = 1';
-		$pass = '$6$rounds=500000$cg7dVrrKU5DvROA0$/5ZZ/Dx/ZDRKB2MrNyPkge.BY8o3JJpC0dgbUlmwxDl/vojdMi72idsRQ1RDNd.W.gZ/zKK2qPsvKOVxXCMyU/';
-		list(,,, $salt) = explode('$', $pass);
-		$check_pass = crypt($this->json['password'], '$6$rounds=500000$' . $salt . '$');
-		if (hash_equals($pass, $check_pass)) {
-			$this->login_ok();
-			return true;
+		$prepared = $this->pdo_ro->prepare($sql);
+		$prepared->bindParam(':name', $this->json['user']);
+		$prepared->execute();
+		$client = $prepared->fetchAll(\PDO::FETCH_ASSOC);
+		if (count($client) > 0) {
+			list(, $type, $options, $salt) = explode('$', $client[0]['password']);
+			$check_pass = crypt($this->json['password'], '$' . $type . '$' . $options . '$' . $salt . '$');
+			if (hash_equals($client[0]['password'], $check_pass)) {
+				$client_data['id'] = $client[0]['id'];
+				$client_data['name'] = $client[0]['name'];
+				$client_data['gid'] = $client[0]['gid'];
+				$client_data['active'] = $client[0]['active'];
+				self::login_ok($client_data, $this->login_type);
+				return true;
+			} else {
+				self::login_bad();
+				return false;
+			}
 		} else {
-			$this->login_bad();
 			return false;
 		}
 	}
 
-	private function login_ok() {
+	private static function login_ok($client_data = [], $login_type = 'nobody') {
 		\OpenHCP\OpenHCP::startSession();
-		\OpenHCP\OpenHCP::sendData(200, true);
+		$_SESSION['loggedin'] = true;
+		$_SESSION['user']['type'] = $login_type;
+		$_SESSION['user']['data'] = $client_data;
+		$data = ["status" => true, "info" => "Hello, Dave."];
+		\OpenHCP\OpenHCP::sendData(200, $data);
 	}
 
-	private function login_bad() {
-		\OpenHCP\OpenHCP::sendData(401);
+	private static function login_bad() {
+		$data = ["status" => false, "info" => "Bad user and/or password"];
+		\OpenHCP\OpenHCP::sendData(401, $data);
 	}
 
 	public static function generatePasswordHash($password) {

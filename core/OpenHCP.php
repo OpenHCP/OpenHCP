@@ -37,6 +37,11 @@ class OpenHCP {
 		'class' => 'Client',
 		'method' => 'getClients',
 		'proto' => 'GET'
+	    ],
+	    'client' => [
+		'class' => 'Client',
+		'method' => 'getClient',
+		'proto' => 'GET'
 	    ]
 	];
 
@@ -75,6 +80,11 @@ class OpenHCP {
 		$this->URI = explode('/', $this->URI_long);
 	}
 
+	/**
+	 * router
+	 * 
+	 * calls method of class using URI data
+	 */
 	private function router() {
 		if ($this->URI[0] != '' && isset($this->routing[$this->URI_long]) && $this->routing[$this->URI_long]['proto'] == $_SERVER["REQUEST_METHOD"]) {
 			$class_name = '\\OpenHCP\\' . $this->routing[$this->URI_long]['class'];
@@ -85,6 +95,7 @@ class OpenHCP {
 				exit();
 			}
 		}
+		self::sendData(400, ["status" => false, "info" => "Bad request."]);
 	}
 
 	public static function sessionStarted() {
@@ -102,6 +113,15 @@ class OpenHCP {
 			ini_set('session.cookie_httponly', true);
 			session_name('OPENHCP_SESSION');
 			session_start();
+		}
+	}
+
+	public static function continueSession() {
+		if (isset($_COOKIE['OPENHCP_SESSION'])) {
+			self::startSession();
+			if ($_SESSION['loggedin'] !== true) {
+				self::sendData(401, ["status" => false, "info" => "Session expired."]);
+			}
 		}
 	}
 
@@ -126,12 +146,21 @@ class OpenHCP {
 		header('X-Frame-Options: sameorigin');
 		header('X-Content-Type-Options: nosniff');
 
-		if ($code == 200) {
+		if (count($data) > 0) {
 			header('Content-Type: application/json; charset=utf8');
 			echo json_encode($data);
 		}
 
 		exit;
+	}
+
+	public static function checkAcl($allowed = []) {
+		foreach ($allowed as $type) {
+			if ($type == $_SESSION['user']['type']) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 }

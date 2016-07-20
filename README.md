@@ -27,6 +27,7 @@ Plans (it's easier to say what is done...):
 - support for IPv6
 - billing (connection to external services via API)
 - move some parts to ansible (or other tool for Ops)
+- use random numbers in different places (GID, UID, client ID, etc.) - global ID allocator
 
 ## How to install (scripts will replace your packages and configs - you have been warned!)
 

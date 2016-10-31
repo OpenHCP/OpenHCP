@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Apache + PHP
-apt-get -y install apache2 php5-fpm php5-xcache php5-igbinary php5-geoip php5-mysqlnd php5-recode php5-tidy php5-twig php5-curl php5-gd php5-imagick php5-imap php5-intl php5-mcrypt php5-pspell php5-sqlite php5-xmlrpc php5-xsl
+apt-get -y install apache2 php5-fpm php5-xcache php5-igbinary php5-geoip php5-mysqlnd php5-recode php5-tidy php5-twig php5-curl php5-gd php5-imagick php5-imap php5-intl php5-mcrypt php5-pspell php5-sqlite php5-xmlrpc php5-xsl geoip-database-contrib libapache2-mod-geoip
 
 a2enmod rewrite ssl actions include proxy_fcgi headers access_compat
 
@@ -16,6 +16,9 @@ chmod 644 /etc/apache2/conf-available/security.conf
 mv /etc/php5/fpm/pool.d/www.conf /etc/php5/fpm/pool.d/www.conf.`date +'%Y%m%d%H%M%S'`
 cp php5-fpm/openhcp.conf /etc/php5/fpm/pool.d/
 
+# cURL
+curl --time-cond /etc/ssl/certs/cacert.pem https://curl.haxx.se/ca/cacert.pem --output /etc/ssl/certs/cacert.pem
+
 # PHP
 PHPTMP=`mktemp`
 PHPTZ=`cat /etc/timezone`
@@ -25,6 +28,7 @@ cat /etc/php5/fpm/php.ini | \
 	sed -e 's/expose_php = On/expose_php = Off/' | \
 	sed -e 's/; max_input_vars = 1000/max_input_vars = 10000/' | \
 	sed -e 's/;session.entropy_file = \/dev\/urandom/session.entropy_file = \/dev\/random/' | \
+	sed -e 's/;curl.cainfo =/;curl.cainfo = \/etc\/ssl\/certs\/cacert.pem/' | \
 	sed -e 's/;openssl.capath=/openssl.capath = \/etc\/ssl\/certs/' | \
 	sed -e 's/;opcache.enable=0/opcache.enable=0/' > $PHPTMP
 cat $PHPTMP > /etc/php5/fpm/php.ini
@@ -34,6 +38,7 @@ cat /etc/php5/cli/php.ini | \
 	sed -e 's/expose_php = On/expose_php = Off/' | \
 	sed -e 's/; max_input_vars = 1000/max_input_vars = 10000/' | \
 	sed -e 's/;session.entropy_file = \/dev\/urandom/session.entropy_file = \/dev\/random/' | \
+	sed -e 's/;curl.cainfo =/;curl.cainfo = \/etc\/ssl\/certs\/cacert.pem/' | \
 	sed -e 's/;openssl.capath=/openssl.capath = \/etc\/ssl\/certs/' | \
 	sed -e 's/;opcache.enable=0/opcache.enable=0/' > $PHPTMP
 cat $PHPTMP > /etc/php5/cli/php.ini

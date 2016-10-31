@@ -28,6 +28,9 @@ Plans (it's easier to say what is done...):
 - billing (connection to external services via API)
 - move some parts to ansible (or other tool for Ops)
 - use random numbers in different places (GID, UID, client ID, etc.) - global ID allocator
+- global spam handling - auto-remove after 30 days, way to submit to administration
+- summary mail what files changed on website - daily (connection do backup system)
+- antispam system for compromised websites
 
 ## How to install (scripts will replace your packages and configs - you have been warned!)
 

@@ -13,7 +13,7 @@ echo 'deb http://ftp.debian.org/debian jessie-backports main' >> /etc/apt/source
 apt-get update
 
 # make sure there's enough entropy, current time and some utils
-apt-get -y install haveged ntpdate debconf-utils sudo debian-keyring debianutils needrestart git
+apt-get -y install haveged ntpdate debconf-utils sudo debian-keyring debianutils needrestart git debian-goodies
 
 # make sure the time is current
 ntpdate-debian

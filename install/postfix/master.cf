@@ -38,3 +38,5 @@ amavis unix - - - - 2 smtp
 	-o mynetworks=127.0.0.0/8
 	-o strict_rfc821_envelopes=yes
 	-o receive_override_options=no_unknown_recipient_checks,no_header_body_checks
+
+policyd-spf unix - n n - 0 spawn user=policyd-spf argv=/usr/bin/policyd-spf

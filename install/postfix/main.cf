@@ -6,19 +6,18 @@ virtual_alias_domains =
 virtual_alias_maps = proxy:mysql:/etc/postfix/mysql-virtual_forwardings.cf
 	proxy:mysql:/etc/postfix/mysql-virtual_email2email.cf
 virtual_mailbox_domains = proxy:mysql:/etc/postfix/mysql-virtual_domains.cf
+virtual_mailbox_maps = mysql:/etc/postfix/mysql-virtual_client.cf
+	mysql:/etc/postfix/mysql-virtual_forwardings.cf
 virtual_transport = lmtp:unix:private/dovecot-lmtp
 
 # SASL
 smtpd_sasl_auth_enable = yes
 broken_sasl_auth_clients = yes
-smtpd_sasl_authenticated_header = yes
+smtpd_sasl_authenticated_header = no
 smtpd_sasl_type = dovecot
 smtpd_sasl_path = private/auth
 
 # restrictions
-transport_maps = proxy:mysql:/etc/postfix/mysql-virtual_transports.cf
-relay_domains = mysql:/etc/postfix/mysql-virtual_relaydomains.cf
-relay_recipient_maps = mysql:/etc/postfix/mysql-virtual_relayrecipientmaps.cf
 proxy_read_maps = $local_recipient_maps
 	$mydestination
 	$virtual_alias_maps
@@ -30,29 +29,37 @@ proxy_read_maps = $local_recipient_maps
 	$sender_canonical_maps
 	$recipient_canonical_maps
 	$relocated_maps
-	$transport_maps $mynetworks
+	$transport_maps
+	$mynetworks
+transport_maps = proxy:mysql:/etc/postfix/mysql-virtual_transports.cf
+relay_domains = mysql:/etc/postfix/mysql-virtual_relaydomains.cf
+relay_recipient_maps = mysql:/etc/postfix/mysql-virtual_relayrecipientmaps.cf
 smtpd_helo_required = yes
-smtpd_recipient_restrictions = permit_mynetworks
-	permit_sasl_authenticated
-	reject_unauth_destination
-	reject_unauth_pipelining
-	reject_non_fqdn_recipient
-	reject_unverified_recipient
-	check_recipient_access mysql:/etc/postfix/mysql-virtual_recipient.cf
-smtpd_sender_login_maps = $virtual_alias_maps
-smtpd_sender_restrictions = permit_mynetworks
-	permit_sasl_authenticated
-	reject_sender_login_mismatch
-	reject_unauth_pipelining
-	reject_non_fqdn_sender
-	reject_unknown_helo_hostname
-	reject_unknown_sender_domain
-	reject_unknown_recipient_domain
-	check_sender_access
-	mysql:/etc/postfix/mysql-virtual_sender.cf
-smtpd_client_restrictions = sleep 2
+smtpd_client_restrictions = sleep 3
 	reject_unauth_pipelining
 	check_client_access mysql:/etc/postfix/mysql-virtual_client.cf
+smtpd_sender_login_maps = $virtual_alias_maps
+smtpd_sender_restrictions = sleep 2
+	reject_unauth_pipelining
+	reject_sender_login_mismatch
+	reject_unlisted_sender
+	reject_unknown_sender_domain
+	reject_unknown_recipient_domain
+	permit_sasl_authenticated
+	permit_mynetworks
+	reject_non_fqdn_sender
+	reject_unknown_helo_hostname
+	check_sender_access mysql:/etc/postfix/mysql-virtual_sender.cf
+smtpd_recipient_restrictions = sleep 2
+	reject_unauth_pipelining
+	reject_unauth_destination
+	check_policy_service unix:private/policyd-spf
+	reject_non_fqdn_recipient
+	reject_unverified_recipient
+	permit_sasl_authenticated
+	permit_mynetworks
+	check_recipient_access mysql:/etc/postfix/mysql-virtual_recipient.cf
+policyd-spf_time_limit = 3600
 
 address_verify_negative_refresh_time = 5m
 address_verify_positive_refresh_time = 5m

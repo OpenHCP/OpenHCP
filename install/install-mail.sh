@@ -2,7 +2,7 @@
 
 echo "postfix	postfix/mailname	string	${MAILNAME}" | debconf-set-selections
 echo "postfix	postfix/main_mailer_type	select	Internet Site" | debconf-set-selections
-apt-get -y install postfix postfix-mysql ca-certificates openssl-blacklist openssl-blacklist-extra
+apt-get -y install postfix postfix-mysql ca-certificates openssl-blacklist openssl-blacklist-extra postfix-policyd-spf-python
 
 # installing Dovecot
 apt-get -y install dovecot-imapd dovecot-pop3d dovecot-mysql dovecot-sieve dovecot-lmtpd dovecot-managesieved
